@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.7.14'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+group = 'com.vapor'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+    maven{ url 'https://maven.aliyun.com/repository/central' }
+    maven{ url 'https://maven.aliyun.com/repository/public' }
+    maven{ url 'https://maven.aliyun.com/repository/gradle-plugin'}
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.telegram:telegrambots:6.7.0'
+    implementation 'org.telegram:telegrambots-spring-boot-starter:6.7.0'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
