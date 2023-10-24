@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +80,6 @@ public class DaisyBot extends TelegramLongPollingBot {
             case "/start" -> sendMessage(chatId, EmojiParser.parseToUnicode(startWord));
             case "/help" -> sendMessage(chatId, EmojiParser.parseToUnicode(helpWord));
         }
-
     }
 
     public void dealBotContent(long chatId, String messageContent){
