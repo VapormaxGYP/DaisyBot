@@ -33,6 +33,7 @@ public class DaisyBot extends TelegramLongPollingBot {
 
         try {
             execute(new SetMyCommands(cmdList, new BotCommandScopeDefault(), null));
+
         } catch (TelegramApiException e) {
             log.error("Set Commands List Error {}" ,e.getMessage());
         }
