@@ -1,4 +1,4 @@
-package com.vapor.daisybot;
+package com.vapor.daisybot.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
