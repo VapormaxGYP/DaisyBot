@@ -1,9 +1,10 @@
 package com.vapor.daisybot;
 
-import lombok.Value;
+import com.vapor.daisybot.BotService.AIChat;
+import com.vapor.daisybot.BotService.PrintHelp;
 import lombok.extern.slf4j.Slf4j;
-import com.vdurmont.emoji.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
@@ -22,10 +23,18 @@ import java.util.List;
 
 @Slf4j
 @Component
-@PropertySource(value="classpath:command.properties")
+@PropertySource(value= "classpath:bot.properties")
 public class DaisyBot extends TelegramLongPollingBot {
 
 
+    @Autowired
+    PrintHelp printHelp;
+
+    @Autowired
+    AIChat aiChat;
+
+    @Value("${ai.token}")
+    String aiToken;
     @Autowired
     public DaisyBot(DefaultBotOptions botOptions) {
 
@@ -47,23 +56,27 @@ public class DaisyBot extends TelegramLongPollingBot {
 
         if (update!= null && update.hasMessage()) {
 
-            long chatId = update.getMessage().getChatId();
-
             Message message = update.getMessage();
+            log.info(message.toString());
 
-            //log.info(message.toString());
+            long chatId = message.getChatId();
+            String messageContent = message.getText();
+            String user = message.getFrom().getUserName();
 
-            List<MessageEntity> request = update.getMessage().getEntities();
-            log.info("Get from bot: {}", request);
-
-            MessageEntity entity = request.get(0);
-            String messageType = entity.getType();
-            String messageContent = message.getText().split("@")[0];
+            if(messageContent.contains("@")){
+                messageContent = messageContent.split("@")[0];
+            }
 
             log.info("MessageContent is {}", messageContent);
 
-            if(messageType.equals("bot_command")){
-                dealBotCmd(chatId, messageContent);
+            if(message.getEntities() != null){
+                List<MessageEntity> request = message.getEntities();
+                MessageEntity entity = request.get(0);
+                String messageType = entity.getType();
+
+                if(messageType.equals("bot_command")){
+                    dealBotCmd(chatId, messageContent, user);
+                }
             }
 
         }
@@ -71,11 +84,27 @@ public class DaisyBot extends TelegramLongPollingBot {
     }
 
 
-    public void dealBotCmd(long chatId, String messageContent){
+    public void dealBotCmd(long chatId, String messageContent, String user){
+
+        log.info(aiToken);
+        String words = "";
+        if(messageContent.contains("/chat")){
+            words = messageContent.substring(5);
+            messageContent = "/chat";
+        }
+        log.info("用户输入:" + words.trim());
 
         switch (messageContent){
-            //case "/help" -> sendMessage(chatId, EmojiParser.parseToUnicode(helpMessage));
-            //case "/chat" -> sendMessage(chatId, helpMessage);
+            case "/help" -> sendMessage(chatId, printHelp.genHelpMessage(user));
+            case "/chat" -> {
+                if(words.trim().isEmpty()){
+                    sendMessage(chatId, "请输入内容");
+                }
+                else {
+                    sendMessage(chatId, aiChat.genChatMessage(aiToken, words.trim()));
+                }
+            }
+            default -> sendMessage(chatId, "请输入有效内容");
         }
     }
 

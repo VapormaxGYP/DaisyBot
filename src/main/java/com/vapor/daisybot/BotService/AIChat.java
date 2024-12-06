@@ -2,5 +2,5 @@ package com.vapor.daisybot.BotService;
 
 public interface AIChat {
 
-    void sendChatMessage();
+    String genChatMessage(String content, String words);
 }
